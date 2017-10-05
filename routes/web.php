@@ -18,6 +18,7 @@ use Illuminate\Http\Request;
 Route::group([],function(){
 
     Route::match(['get'],'/',['uses'=>'IndexController@index']);
+    Route::post('/change_email',['uses'=>'IndexController@changeEmail']);
     $this->get('logout', 'Auth\LoginController@logout')->name('logout');
 
 
@@ -44,6 +45,13 @@ Route::group(['middleware'=>'auth'], function(){
 
 
     Route::get('/dashboard',['uses'=>'Admin\DashboardIndexController@index']);
+    Route::get('/dashboard/calendar',['uses'=>'Admin\DashboardCalendarController@index']);
+    Route::get('/dashboard/overview',['uses'=>'Admin\DashboardOverviewController@index']);
+    Route::get('/dashboard/userslist',['uses'=>'Admin\DashboardUsersController@index']);
+    Route::match(['get','post'],'/dashboard/user/add',['uses'=>'Admin\DashboardUsersController@add']);
+    Route::get('/dashboard/user/edit/{id}',['uses'=>'Admin\DashboardUsersController@edit']);
+    Route::post('/dashboard/user/update',['uses'=>'Admin\DashboardUsersController@update']);
+    Route::post('/dashboard/user/delete',['uses'=>'Admin\DashboardUsersController@delete']);
 
 /*    Route::get('/',function(){
         if(auth()){

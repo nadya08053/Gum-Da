@@ -23,6 +23,9 @@
     <link rel="stylesheet" href="{{ asset('/admin/fonts/pe-icon-7-stroke/css/helper.css') }}" />
     <link rel="stylesheet" href="{{ asset('/admin/styles/style.css') }}">
 
+
+    <script src="{{ asset('/admin/vendor/jquery/dist/jquery.min.js') }}"></script>
+
 </head>
 <body>
 
@@ -44,7 +47,7 @@
     </div>
     <div id="logo" class="light-version">
         <span>
-            Gym Da
+            Gym
         </span>
     </div>
     <nav role="navigation">
@@ -204,10 +207,14 @@
     <div id="navigation">
         <div class="profile-picture">
             <a href="/">
-                <span class="font-extra-bold font-uppercase">Back to site</span>
-{{--                <img src="/public/admin/images/profile.jpg" class="img-circle m-b" alt="logo">--}}
+                <?php
+                $img = Auth::user()->img;
+                 if(!$img){?>
+                    <img src="/admin/images/no_avatar.png" class="img-circle m-b" alt="logo">
+                <?php }else{?>
+                    <img src="/admin/uploads/users/<?=$img?>" class="img-circle m-b" alt="logo">
+                <?php } ?>
             </a>
-
             <div class="stats-label text-color">
 {{--                <span class="font-extra-bold font-uppercase">Robert Razer</span>--}}
 
@@ -241,12 +248,26 @@
             </li>
 
             <li>
+                <a href="/dashboard/userslist"> <span class="nav-label">Users</span></a>
+            </li>
+
+            <li>
+                <a href="/dashboard/overview"> <span class="nav-label">Overview</span></a>
+            </li>
+
+            <li>
+                <a href="/dashboard/calendar"> <span class="nav-label">Calendar</span></a>
+            </li>
+
+
+
+{{--            <li>
                 <a href="#"><span class="nav-label">Users</span><span class="fa arrow"></span> </a>
                 <ul class="nav nav-second-level">
-                    <li><a href="#">List</a></li>
-                    <li><a href="#">Add</a></li>
+                    <li><a href="/dashboard/userslist">List</a></li>
+                    <li><a href="/dashboard/user/add">Add</a></li>
                 </ul>
-            </li>
+            </li>--}}
 
         </ul>
     </div>
@@ -255,7 +276,6 @@
 <!-- Main Wrapper -->
 <div id="wrapper">
 
-
     @yield('content')
 
 
@@ -263,14 +283,14 @@
     <footer class="footer">
         <span class="pull-right">
         </span>
-        Gym Da <?=date('Y')?>
+        Gym <?=date('Y')?>
     </footer>
 
 </div>
 
 <!-- Vendor scripts -->
-<script src="{{ asset('/admin/vendor/jquery/dist/jquery.min.js') }}"></script>
-<script src="{{ asset('/admin/vendor/jquery-ui/jquery-ui.min.js') }}"></script>
+
+
 <script src="{{ asset('/admin/vendor/slimScroll/jquery.slimscroll.min.js') }}"></script>
 <script src="{{ asset('/admin/vendor/bootstrap/dist/js/bootstrap.min.js') }}"></script>
 <script src="{{ asset('/admin/vendor/jquery-flot/jquery.flot.js') }}"></script>
