@@ -15,11 +15,10 @@ class DashboardUsersController extends Controller
    public function index(){
        $role = Auth::user()->role;
 
-       if($role == 'admin' || $role == 'client' || $role == 'customer') {
-           $list = DB::table('users')->get();
-       }
-       if($role == 'trainer') {
+       if($role == 'Trainer') {
            $list = DB::table('users')->where('role', 'customer')->get();
+       }else{
+           $list = DB::table('users')->get();
        }
 
        return view('admin.users.index',[
@@ -43,7 +42,21 @@ class DashboardUsersController extends Controller
 
     public function update(){
 
-        if(!empty($_POST)) {
+        if(!empty($_POST['edit'])) {
+
+            unset($_POST['edit']);
+
+            if(!empty($_POST['club'])){
+                $users_id = $_POST['id'];
+
+                DB::table('users_facility')->insert(
+                    [
+                        'facility_id'=>$_POST['club'],
+                        'users_id'=>$users_id,
+                    ]
+                );
+            }
+            unset($_POST['club']);
 
             if($_FILES['file']['error'] == false) {
                 $img['file'] = $_FILES['file'];
@@ -106,12 +119,39 @@ class DashboardUsersController extends Controller
 
     public function add(){
 
-        if(!empty($_POST)){
+        $statesList = DB::table('states')->get();
+
+        if(!empty($_POST['facility_role'])){
+            $role = DB::table('facility')->select("id", "name")->get()->toJson();
+            echo $role;
+            exit;
+        }
+
+        if(!empty($_POST['add'])){
+            unset($_POST['add']);
+
+            if(!empty($_POST['club'])){
+
+                $last_id = DB::table('users')->select('id')->orderBy('id', 'desc')->first();
+               $users_id = $last_id->id + 1;
+
+                DB::table('users_facility')->insert(
+                    [
+                        'facility_id'=>$_POST['club'],
+                        'users_id'=>$users_id,
+                    ]
+                 );
+            }
+            unset($_POST['club']);
+
             if($_FILES['file']['error'] == false) {
                 $img['file'] = $_FILES['file'];
                 $path = 'admin/uploads/users/';
                 $_POST['img'] = Help::resizeAndUpload($img, $path);
+            }else{
+                $_POST['img'] = null;
             }
+
             unset($_POST['confpassword']);
             $_POST['password'] = bcrypt($_POST['password']);
             $_POST['remember_token'] = Str::random(60);
@@ -132,7 +172,7 @@ class DashboardUsersController extends Controller
                     'gender'=>trim(addslashes(strip_tags($_POST['gender']))),
                     'img'=>$_POST['img'],
                     'dob'=>$_POST['dob'],
-                    'deleted'=>$_POST['deleted'],
+                    'deleted'=>0,
                     'role'=>$_POST['role'],
                     'remember_token'=>$_POST['remember_token'],
                     'created_at'=>date('Y-m-d H:i:s'),
@@ -147,7 +187,7 @@ class DashboardUsersController extends Controller
 
         }
 
-        return view('admin.users.add');
+        return view('admin.users.add',['statesList'=>$statesList]);
     }
 
 

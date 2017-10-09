@@ -22,38 +22,18 @@ use Illuminate\Support\Facades\DB;
                     <ol class="hbreadcrumb breadcrumb">
                         <li><a href="/dashboard">Dashboard</a></li>
                         <li class="active">
-                            <span>Users List</span>
+                            <span>Facility Users List</span>
                         </li>
                     </ol>
                 </div>
                 <h2 class="font-light m-b-xs">
-                    Users List
+                    Facility users list
                 </h2>
-                <small>list of all site users</small>
+                <small>list of all facility users</small>
             </div>
         </div>
     </div>
 
-<?php
-     $role = Auth::user()->role;
-    if($role !== 'Customer'){?>
-
-    <div class="content" style="padding-bottom: 0;">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="hpanel">
-                    <div class="panel-body">
-                        <a href="/dashboard/user/add" class="btn btn-primary" type="button"><i class="fa fa-group"></i> <br/>Add User</a>
-
-{{--                        <button class="btn btn-danger2" id="deletedShow" type="button"><i class="fa fa-group"></i> <br>Deleted Users</button>--}}
-
-                        </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <?php } ?>
 
     <div class="content" style="padding-top: 0;">
 
@@ -75,10 +55,8 @@ use Illuminate\Support\Facades\DB;
                             <tr>
                                 <th>Name</th>
                                 <th>Email</th>
-                                <th>Trainer</th>
                                 <th>Created</th>
                                 <th>Phone</th>
-                                <th>Role</th>
                                 <td></td>
                             </tr>
                             </thead>
@@ -86,41 +64,31 @@ use Illuminate\Support\Facades\DB;
 
                             <tbody>
                             <?php
-                              foreach($list as $items):
+                            foreach($users_id as $item):
+
+                                   $id = $item->users_id;
+                            $user = DB::table('users')->where('id',$id)->get();
+                                    foreach($user as $items):
                             ?>
                             <tr>
-                                <td><?php
-                                    if($items->deleted == 1){
-                                    echo '<a href="/dashboard/user/edit/'. $items->id . '" style="font-style: italic;">'. $items->name .'</a>';
-                                    }else{
-                                        echo '<a href="/dashboard/user/edit/'. $items->id . '">'. $items->name .'</a>';
-                                     } ?>
-                                </td>
+                                <td><?php echo '<a href="/dashboard/user/edit/'. $items->id . '">'. $items->name .'</a>';?></td>
                                 <td><?php echo '<a href="mailto:'.$items->email.'">' . $items->email . '</a>'?></td>
-                                <td><?php
-                                    $trainer = $items->trainers_id;
-                                        $name = DB::table('users')->select('name')->where('id', $trainer)->get();
-
-                                        foreach($name as $item){
-                                            echo  $item->name;
-                                        }
-                                    ?></td>
                                 <td><?=$items->created_at?></td>
                                 <td><?php echo '<a href="tel:'.$items->phone.'">' . $items->phone . '</a>'?></td>
-                                <td><?=$items->role?></td>
                                 <td style="text-align: center;">
 
                                     <?php $role = Auth::user()->role;
                                     if($role !== 'Customer'){?>
-                                       <?php if($items->deleted == 0){?>
-                                       <button id="<?=$items->id?>" class="btn btn-danger btn-xs">Delete</button>
+                                        <?php if($items->deleted == 0){?>
+                                        <button id="<?=$items->id?>" class="btn btn-danger btn-xs">Delete</button>
                                         <?php }else{ ?>
                                         <button id="<?=$items->id?>" class="btn btn-success btn-xs">Activate</button>
                                         <?php } ?>
                                     <?php } ?>
                                 </td>
                             </tr>
-                             <?php endforeach;?>
+                              <?php endforeach;?>
+                            <?php endforeach;?>
                             </tbody>
                         </table>
 
@@ -131,7 +99,7 @@ use Illuminate\Support\Facades\DB;
         </div>
     </div>
 
-
+<div class="facility_id" style="display: none"><?=$facility_id?></div>
 
 
     <script src="{{ asset('/admin/vendor/datatables/media/js/jquery.dataTables.min.js') }}"></script>
@@ -153,26 +121,23 @@ use Illuminate\Support\Facades\DB;
 
 
                 var texts = $(this).text();
-                var val = '';
-                if(texts == 'Delete') {
+                var facility_id = $('.facility_id').text();
+
                     var conf = confirm("Are you sure you want to delete?");
-                     val = 1;
-                }else{
-                    var conf = confirm("Are you sure you want to activate?");
-                    val = 0;
-                }
+
                 var id = $(this).attr('id');
 
                 if(conf == true){
 
                     var data = {
                         id:id,
-                        val:val,
-                        deleted :true
+                        facility_id :facility_id,
+                        deleted_fac :true
                     };
 
+
                     $.ajax({
-                        url: '/dashboard/user/delete',
+                        url: '/dashboard/facility/delete',
                         type: 'POST',
                         data: data,
                         success: function (res) {

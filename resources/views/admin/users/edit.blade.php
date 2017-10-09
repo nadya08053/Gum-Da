@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\DB;
 @extends('admin.layouts.main')
 
 @section('content')
-
+    <script src="{{ asset('/admin/vendor/jquery/dist/jquery.min.js') }}"></script>
 
     <link rel="stylesheet" href="{{ asset('/admin/vendor/bootstrap-datepicker-master/dist/css/bootstrap-datepicker3.min.css') }}" />
 
@@ -53,6 +53,7 @@ use Illuminate\Support\Facades\DB;
                         <?php foreach($user as $items):?>
 
                         <input type="hidden" id="id" name="id" value="<?=$items->id?>">
+                        <input type="hidden" id="edit" name="edit" value="true">
 
                         <div class="form-group"><label class="col-sm-2 control-label">Name *</label>
 
@@ -227,7 +228,7 @@ use Illuminate\Support\Facades\DB;
 
                             <?php
                             $role = Auth::user()->role;
-                                if($role !== 'customer'){
+                                if($role !== 'Customer'){
                             ?>
                             <div class="form-group"><label class="col-sm-2 control-label">Trainers</label>
 
@@ -332,7 +333,12 @@ use Illuminate\Support\Facades\DB;
                                 </div>
                             </div>
 
+                            <div class="facility">
 
+                                <div id="radio">
+                                </div>
+
+                            </div>
 
                           <?php endforeach;?>
 
@@ -377,50 +383,8 @@ use Illuminate\Support\Facades\DB;
 
         $(function(){
             $('#datapicker2').datepicker();
-        });
 
 
-/*        $('#role').click(function(){
-            var role = $(this).val();
-
-            if(role == 'Client'){
-
-                var data = {
-                    roles :true
-                };
-
-                $.ajax({
-                    url: '/dashboard/user/',
-                    type: 'POST',
-                    data: data,
-                    success: function (res) {
-
-                    },
-                    error: function (res) {
-                        if (res == false) console.log('Data Error!');
-                    }
-                });
-            }
-
-        });*/
-
-        $("#phone").bind('textchange',function(){
-            var key = event.keyCode;
-            var phone = $('#phone').val();
-            if(key !== 8) {
-                if (phone.length == 1) {
-                    $(this).val('(' + phone);
-                }
-                if (phone.length == 4) {
-                    $(this).val(phone + ') ');
-                }
-
-                if (phone.length == 9) {
-                    $(this).val(phone + '-');
-                }
-            }
-
-        });
 
         $('#delImage').click(function(e){
             e.preventDefault();
@@ -477,19 +441,11 @@ use Illuminate\Support\Facades\DB;
 
         });
 
-        function goBack() {
-            window.history.back();
-        }
 
 
         $("form#editUserForm").submit(function(e){
             e.preventDefault();
 
-
-/*            var formData = {};
-            $("#editUserForm input, #editUserForm select").each(function(i, obj) {
-                formData[obj.name] = $(obj).val();
-            });*/
 
             var formData = new FormData($(this)[0]);
 
@@ -517,8 +473,8 @@ use Illuminate\Support\Facades\DB;
             }
 
 
+          });
         });
-
     </script>
 
 @stop

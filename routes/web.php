@@ -53,6 +53,13 @@ Route::group(['middleware'=>'auth'], function(){
     Route::post('/dashboard/user/update',['uses'=>'Admin\DashboardUsersController@update']);
     Route::post('/dashboard/user/delete',['uses'=>'Admin\DashboardUsersController@delete']);
 
+    Route::get('/dashboard/facility',['uses'=>'Admin\DashboardFacilityController@index']);
+    Route::match(['get','post'],'/dashboard/facility/add',['uses'=>'Admin\DashboardFacilityController@add']);
+    Route::get('/dashboard/facility/edit/{id}',['uses'=>'Admin\DashboardFacilityController@edit']);
+    Route::get('/dashboard/facility/view/{id}',['uses'=>'Admin\DashboardFacilityController@view']);
+    Route::post('/dashboard/facility/update',['uses'=>'Admin\DashboardFacilityController@update']);
+    Route::post('/dashboard/facility/delete',['uses'=>'Admin\DashboardFacilityController@delete']);
+
 /*    Route::get('/',function(){
         if(auth()){
             return  $redirectTo = '/';

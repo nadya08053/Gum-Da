@@ -1,7 +1,11 @@
+<?php
+
+use Illuminate\Support\Facades\DB;
+?>
 @extends('admin.layouts.main')
 
 @section('content')
-
+    <script src="{{ asset('/admin/vendor/jquery/dist/jquery.min.js') }}"></script>
     <link rel="stylesheet" href="{{ asset('/admin/vendor/bootstrap-datepicker-master/dist/css/bootstrap-datepicker3.min.css') }}" />
 
     <div class="normalheader transition animated fadeIn">
@@ -24,7 +28,7 @@
                 <h2 class="font-light m-b-xs">
                    Add User form
                 </h2>
-                <small>All fields are required</small>
+                <small>* Enter all required fields</small>
             </div>
         </div>
     </div>
@@ -44,7 +48,10 @@
                     <div class="panel-body">
                         <form id="addUserForm" class="form-horizontal">
 
-                            <div class="form-group"><label class="col-sm-2 control-label">Name</label>
+
+                            <input type="hidden" name="add" value="true">
+
+                            <div class="form-group"><label class="col-sm-2 control-label">Name *</label>
 
                                 <div class="col-sm-10">
                                     <input type="text" placeholder="Name" id="name" name="name" class="form-control m-b">
@@ -53,58 +60,29 @@
                             </div>
 
 
-                            <div class="form-group"><label class="col-sm-2 control-label">Password</label>
+                            <div class="form-group">
 
-                                <div class="col-sm-10">
-                                    <input type="password" placeholder="Password" id="password" name="password" class="form-control m-b">
-                                    <span class="password"></span>
+                                <div>
+                                    <label class="col-sm-2 col-md-2 col-lg-2 control-label">Password *</label>
+                                    <div class="col-sm-5 col-md-5 col-lg-5">
+                                        <input type="password" placeholder="Password" id="password" name="password" class="form-control m-b">
+                                        <span class="password"></span>
+                                    </div>
+                                    <div class="col-sm-5 col-md-5 col-lg-5">
+                                        <input type="password" placeholder="Confirm password" id="confpassword" name="confpassword" class="form-control m-b">
+                                        <span class="confpassword"></span>
+                                    </div>
                                 </div>
+
                             </div>
 
-                            <div class="form-group"><label class="col-sm-2 control-label">Confirm password</label>
-
-                                <div class="col-sm-10">
-                                    <input type="password" placeholder="Confirm password" id="confpassword" name="confpassword" class="form-control m-b">
-                                    <span class="confpassword"></span>
-
-                                </div>
-                            </div>
+                            {{--                            <div class="form-group"><label class="col-sm-2 control-label">Confirm password</label>
 
 
-                            <div class="form-group"><label class="col-sm-2 control-label">Image</label>
-
-                                <div class="col-sm-10">
-                                    <input type="file" name="file"  class="form-control">
-                                </div>
-                            </div>
-
-                            <div class="form-group"><label class="col-sm-2 control-label">First name</label>
-
-                                <div class="col-sm-10">
-                                    <input type="text" placeholder="First name" id="fname" name="fname" class="form-control m-b">
-                                    <span class="fname"></span>
-                                </div>
-                            </div>
-
-                            <div class="form-group"><label class="col-sm-2 control-label">Last name</label>
-
-                                <div class="col-sm-10">
-                                    <input type="text" placeholder="Last name" id="lname" name="lname" class="form-control m-b">
-                                    <span class="lname"></span>
-                                </div>
-                            </div>
+                                                        </div>--}}
 
 
-                            <div class="form-group"><label class="col-sm-2 control-label">Phone</label>
-
-                                <div class="col-sm-10">
-                                    <input type="text" placeholder="Phone" id="phone" name="phone" class="form-control m-b">
-                                    <span class="phone"></span>
-                                </div>
-                            </div>
-
-
-                            <div class="form-group"><label class="col-sm-2 control-label">Email</label>
+                            <div class="form-group"><label class="col-sm-2 control-label">Email *</label>
 
                                 <div class="col-sm-10">
                                     <input type="email" placeholder="Email" id="email" name="email" class="form-control m-b">
@@ -112,57 +90,174 @@
                                 </div>
                             </div>
 
+                            <style>
+                                .profileImg img{
 
-                            <div class="form-group"><label class="col-sm-2 control-label">Street_1</label>
+                                    width: 100px;
+                                    margin: 10px 0 10px 0;
+                                }
+                                .profileImg{
+                                    text-align: center;
+                                }
+                                #allProfile{
+                                    padding: 20px 0 20px 0;
+                                    margin: 40px;
+                                    border-bottom: 1px solid lightgrey;
+                                    border-top: 1px solid lightgrey;
+                                }
+                            </style>
+
+                            <div class="col-sm-12 col-md-12 col-lg-12" id="allProfile">
+
+
+                                <h2>Profile</h2>
+
+                                <div class="col-sm-12 col-md-12 col-lg-12">
+                                    <div class="col-sm-6 col-md-6 col-lg-6">
+                                        <div class="profileImg">
+                                            <img src="/admin/images/no_avatar.png" class="img-circle m-b" alt="logo">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-3 col-md-3 col-lg-3 control-label">Image</label>
+
+                                            <div class="col-sm-9 col-md-9 col-lg-9">
+                                                <input type="file" id="file" name="file"  class="form-control">
+                                                <span id="fileCheck"></span>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                    <div class="col-sm-6 col-md-6 col-lg-6">
+
+                                        <div>
+                                            <div class="col-sm-6 col-md-6 col-lg-6">
+                                                <p class="col-md-12 col-lg-12"><b>Birth Date</b></p>
+
+                                                <div class="col-md-12 col-lg-12">
+                                                    <input id="datapicker2" name="dob"  type="text" class="form-control">
+                                                    <span class="datapicker2"></span>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6 col-lg-6">
+                                                <p class="col-md-12 col-lg-12"><b>Gender</b></p>
+
+                                                <div class="col-md-12 col-lg-12">
+                                                    <select name="gender" class="form-control m-b">
+                                                        <?php $selectGender = [ 'Male' => 'Male', 'Female' => 'Female'];
+                                                        foreach($selectGender as $key => $val):?>
+                                                        <option value="<?=$key?>"><?=$val?></option>
+                                                        <?php endforeach;?>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div style="clear: both;"></div>
+                                        </div>
+
+
+                                        <div  class="col-md-12 col-lg-12">
+                                            <p class="col-sm-12"><b>Contact number</b></p>
+
+                                            <div class="col-sm-12">
+                                                <input type="text" placeholder="Phone"  name="phone" class="form-control m-b" id="phone" maxlength="14">
+                                                <span class="phone"></span>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <div>
+                                    <label class="col-sm-2 col-md-2 col-lg-2 control-label">First name</label>
+                                    <div class="col-sm-4 col-md-4 col-lg-4">
+                                        <input type="text" placeholder="First name" id="fname" name="fname" class="form-control m-b">
+                                        <span class="fname"></span>
+                                    </div>
+                                    <label class="col-sm-2 col-md-2 col-lg-2 control-label">Last name</label>
+                                    <div class="col-sm-4 col-md-4 col-lg-4">
+
+                                        <input type="text" placeholder="Last name" id="lname" name="lname" class="form-control m-b">
+                                        <span class="lname"></span>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+
+                            <div class="form-group"><label class="col-sm-2 control-label">Address 1</label>
 
                                 <div class="col-sm-10">
-                                    <input type="text" placeholder="Street_1" id="street_1" name="street_1" class="form-control m-b">
+                                    <input type="text" placeholder="Address 1" id="street_1" name="street_1" class="form-control m-b">
                                     <span class="street_1"></span>
                                 </div>
                             </div>
 
-                            <div class="form-group"><label class="col-sm-2 control-label">Street_2</label>
+                            <div class="form-group"><label class="col-sm-2 control-label">Address 2</label>
 
                                 <div class="col-sm-10">
-                                    <input type="text" placeholder="Street_2" id="street_2" name="street_2" class="form-control m-b">
+                                    <input type="text" placeholder="Address 2" id="street_2" name="street_2" class="form-control m-b">
                                     <span class="street_2"></span>
                                 </div>
                             </div>
 
 
-                            <div class="form-group"><label class="col-sm-2 control-label">City</label>
+                            <?php
+                            $role = Auth::user()->role;
+                            if($role !== 'Customer'){
+                            ?>
+                            <div class="form-group"><label class="col-sm-2 control-label">Trainers</label>
 
                                 <div class="col-sm-10">
-                                    <input type="text" placeholder="City" id="city" name="city" class="form-control m-b">
-                                    <span class="city"></span>
+                                    <select name="trainers_id" class="form-control m-b">
+                                        <option>- Select trainer -</option>
+                                        <?php
+                                        $trainers = DB::table('users')->select('id' , 'name')->where('role', 'trainer')->get();
+
+                                        foreach($trainers as $val):?>
+                                        <option value="<?=$val->id?>"><?=$val->name?></option>
+
+                                        <?php endforeach;?>
+                                    </select>
                                 </div>
+                            </div>
+                            <?php } ?>
+
+
+
+                            <div class="form-group">
+
+                                <div>
+                                    <label class="col-sm-2 col-md-2 col-lg-2 control-label">City</label>
+                                    <div class="col-sm-4 col-md-4 col-lg-4">
+                                        <input type="text" placeholder="City" id="city" name="city" class="form-control m-b">
+                                        <span class="city"></span>
+                                    </div>
+                                    <label class="col-sm-2 col-md-2 col-lg-2 control-label">Zip</label>
+                                    <div class="col-sm-4 col-md-4 col-lg-4">
+                                        <input type="number" placeholder="zip" id="zip" name="zip" class="form-control m-b">
+                                        <span class="zip"></span>
+                                    </div>
+                                </div>
+
                             </div>
 
 
                             <div class="form-group"><label class="col-sm-2 control-label">State</label>
-
                                 <div class="col-sm-10">
-                                    <input type="text" placeholder="State" id="state" name="state" class="form-control m-b">
-                                    <span class="state"></span>
-                                </div>
-                            </div>
+                                    <select name="state" class="form-control m-b">
+                                        <?php
 
-                            <div class="form-group"><label class="col-sm-2 control-label">Zip</label>
-
-                                <div class="col-sm-10">
-                                    <input type="number" placeholder="zip" id="zip" name="zip" class="form-control m-b">
-                                    <span class="zip"></span>
-                                </div>
-                            </div>
-
-
-                            <div class="form-group"><label class="col-sm-2 control-label">Gender</label>
-
-                                <div class="col-sm-10">
-                                    <select name="gender" class="form-control m-b">
-                                        <?php $selectGender = [ 'Male' => 'Male', 'Female' => 'Female'];
-                                        foreach($selectGender as $key => $val):?>
-                                        <option value="<?=$key?>"><?=$val?></option>
+                                        foreach($statesList as $key):?>
+                                        <option value="<?=$key->stateName?>"><?=$key->stateName?></option>
                                         <?php endforeach;?>
                                     </select>
                                 </div>
@@ -170,21 +265,15 @@
 
 
 
-                            <div class="form-group"><label class="col-sm-2 control-label">Dob</label>
 
-                                <div class="col-sm-10">
-                                    <input id="datapicker2" name="dob" type="text" class="form-control">
-                                    <span class="datapicker2"></span>
-                                </div>
-                            </div>
 
                             <?php $role = Auth::user()->role;
                             if($role == 'admin'){?>
-                            <div class="form-group"><label class="col-sm-2 control-label">Deleted</label>
+                            <div class="form-group"><label class="col-sm-2 control-label">Status</label>
 
                                 <div class="col-sm-10">
                                     <select name="deleted" class="form-control m-b">
-                                        <?php $selectDeleted = [ 0 => 'No', 1 => 'Yes'];
+                                        <?php $selectDeleted = [ 0 => 'Activate', 1 => 'Delete'];
                                         foreach($selectDeleted as $key => $val):?>
                                         <option value="<?=$key?>"><?=$val?></option>
                                         <?php endforeach;?>
@@ -193,18 +282,27 @@
                             </div>
                             <?php } ?>
 
+
                             <div class="form-group"><label class="col-sm-2 control-label">Role</label>
 
                                 <div class="col-sm-10">
 
-                                    <select name="role" class="form-control m-b">
+                                    <select name="role" id="role" class="form-control m-b">
                                         <?php
-                                        $selectRole = ['admin','trainer','client','customer'];
-                                        foreach($selectRole as $val):?>
+                                        $selectRole = ['Admin','Client','Trainer','Customer'];
+                                        foreach($selectRole as $val): ?>
                                         <option value="<?=$val?>"><?=$val?></option>
                                         <?php endforeach;?>
                                     </select>
                                 </div>
+
+                            </div>
+
+                            <div class="facility">
+
+                                <div id="radio">
+                                </div>
+
                             </div>
 
 
@@ -239,6 +337,7 @@
 
     <script src="{{ asset('/admin/vendor/jquery-ui/jquery-ui.min.js') }}"></script>
     <script src="{{ asset('/admin/vendor/bootstrap-datepicker-master/dist/js/bootstrap-datepicker.min.js') }}"></script>
+    <script src="{{ asset('/admin/scripts/jquery.textchange.js') }}"></script>
     <script src="{{ asset('/admin/scripts/validations.js') }}"></script>
 
 
@@ -246,27 +345,11 @@
 
         $(function(){
             $('#datapicker2').datepicker();
-            $('.input-group.date').datepicker({ });
-            $('.input-daterange').datepicker({ });
-
-
-        });
-
-        function goBack() {
-            window.history.back();
-        }
 
 
 
-
-        $("form#addUserForm").submit(function(e){
+            $("form#addUserForm").submit(function(e){
             e.preventDefault();
-
-
-            /*            var formData = {};
-             $("#editUserForm input, #editUserForm select").each(function(i, obj) {
-             formData[obj.name] = $(obj).val();
-             });*/
 
             var formData = new FormData($(this)[0]);
 
@@ -294,6 +377,7 @@
             }
 
 
+          });
         });
 
     </script>

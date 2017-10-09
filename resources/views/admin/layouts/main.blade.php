@@ -24,7 +24,6 @@
     <link rel="stylesheet" href="{{ asset('/admin/styles/style.css') }}">
 
 
-    <script src="{{ asset('/admin/vendor/jquery/dist/jquery.min.js') }}"></script>
 
 </head>
 <body>
@@ -249,6 +248,9 @@
 
             <li>
                 <a href="/dashboard/userslist"> <span class="nav-label">Users</span></a>
+            </li>
+            <li>
+                <a href="/dashboard/facility"> <span class="nav-label">Facility</span></a>
             </li>
 
             <li>

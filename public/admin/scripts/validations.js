@@ -1,3 +1,9 @@
+
+function goBack() {
+    window.history.back();
+}
+
+
 $(function(){
 
     //$("form").mouseover(function(){
@@ -30,6 +36,33 @@ $(function(){
         });
 
     //});
+
+
+    $("#phone").bind('textchange',function (){
+
+        document.addEventListener('keydown', function (e) {
+            var phone = $('#phone').val();
+            var check =  phone.match(/^([\+]+)*[0-9\x20\x28\x29\-]{0,14}$/);
+
+            if(check == null) $('#phone').val(phone.substring(0, phone.length - 1));
+
+
+            var key = e.keyCode;
+            if(key !== 8) {
+                if (phone.length == 1) {
+                    $('#phone').val('(' + phone);
+                }
+                if (phone.length == 4) {
+                    $('#phone').val(phone + ') ');
+                }
+                if (phone.length == 9) {
+                    $('#phone').val(phone + '-');
+                }
+            }
+
+        });
+
+    });
 
 
     $("form input").blur(function(){
@@ -155,6 +188,51 @@ $(function(){
         }
 
     });
+
+
+    $('#role').click(function(){
+        var role = $(this).val();
+
+        if ($('#radio').hasClass('club') ){
+            return;
+        }
+
+        if(role == 'Client'){
+
+            var data = {
+                facility_role: true
+            };
+
+            $.ajax({
+                url: '/dashboard/user/add',
+                type: 'POST',
+                data: data,
+                success: function (res) {
+                    if (res !== '') {
+                        $("#radio").addClass('club');
+                        var result = $.parseJSON(res);
+
+                        var out = '<div class="form-group"><label class="col-sm-2 control-label">Select Facility</label>' +
+                            '<div class="col-sm-10">' +
+                            '<select name="club" id="club" class="form-control m-b">';
+
+                        for (var i = 0; i < result.length; i++) {
+                            out += '<option value="'+result[i].id +'">'+result[i].name +'</option>';
+                        }
+                        out += '</select></div></div>';
+
+                        $("#radio").append(out);
+                    }
+                },
+                error: function (res) {
+                    if (res == false) console.log('Data error!');
+                }
+            });
+
+        }
+
+    });
+
 
 
 });
