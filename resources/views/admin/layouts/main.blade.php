@@ -1,40 +1,41 @@
+<?php
+use App\Facility;
+
+$user = Auth::user();
+?>
 <!DOCTYPE html>
 <html>
 <head>
-
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-
     <!-- Page title -->
     <title>Dashboard</title>
-
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <!--<link rel="shortcut icon" type="image/ico" href="favicon.ico" />-->
-
     <!-- Vendor styles -->
     <link rel="stylesheet" href="{{ asset('/admin/vendor/fontawesome/css/font-awesome.css') }}" />
     <link rel="stylesheet" href="{{ asset('/admin/vendor/metisMenu/dist/metisMenu.css') }}" />
     <link rel="stylesheet" href="{{ asset('/admin/vendor/animate.css/animate.css') }}" />
     <link rel="stylesheet" href="{{ asset('/admin/vendor/bootstrap/dist/css/bootstrap.css') }}" />
-
     <!-- App styles -->
     <link rel="stylesheet" href="{{ asset('/admin/fonts/pe-icon-7-stroke/css/pe-icon-7-stroke.css') }}" />
     <link rel="stylesheet" href="{{ asset('/admin/fonts/pe-icon-7-stroke/css/helper.css') }}" />
     <link rel="stylesheet" href="{{ asset('/admin/styles/style.css') }}">
 
-
-
+    <script src="{{ asset('/admin/vendor/jquery/dist/jquery.min.js') }}"></script>
+    @if ( $user->facility_id && $user->role != "Admin" )
+        <?php $color = Facility::findOrFail($user->facility_id)->color ?>
+        @if ($color!="")
+        <style media="screen">
+            .normalheader {
+                background: {{ $color }};
+            }
+        </style>
+        @endif
+    @endif
 </head>
 <body>
-
-<!-- Simple splash screen-->
-{{--<div class="splash"> <div class="color-line"></div><div class="splash-title">
-        <h1>Homer - Responsive Admin Theme</h1>
-        <p>Special AngularJS Admin Theme for small and medium webapp with very clean and aesthetic style and feel. </p>
-        <img src="/public/admin/images/loading-bars.svg" width="64" height="64" />
-    </div>
-</div>--}}
 <!--[if lt IE 7]>
 <p class="alert alert-danger">You are using an <strong>outdated</strong> browser. Please
     <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
@@ -66,14 +67,8 @@
             <div class="collapse mobile-navbar" id="mobile-collapse">
                 <ul class="nav navbar-nav">
                     <li>
-                        <a class="" href="/logout">Logout</a>
+                        <a class="" href="{{ url('/') }}/logout">Logout</a>
                     </li>
-{{--                    <li>
-                        <a class="" href="login.html">Logout</a>
-                    </li>
-                    <li>
-                        <a class="" href="profile.html">Profile</a>
-                    </li>--}}
                 </ul>
             </div>
         </div>
@@ -106,7 +101,6 @@
                     <a class="dropdown-toggle" href="#" data-toggle="dropdown">
                         <i class="pe-7s-keypad"></i>
                     </a>
-
                     <div class="dropdown-menu hdropdown bigmenu animated flipInX">
                         <table>
                             <tbody>
@@ -192,7 +186,7 @@
                     </a>
                 </li>
                 <li class="dropdown">
-                    <a href="/logout">
+                    <a href="{{ url('/') }}/logout">
                         <i class="pe-7s-upload pe-rotate-90"></i>
                     </a>
                 </li>
@@ -205,31 +199,25 @@
 <aside id="menu">
     <div id="navigation">
         <div class="profile-picture">
-            <a href="/">
-                <?php
-                $img = Auth::user()->img;
-                 if(!$img){?>
-                    <img src="/admin/images/no_avatar.png" class="img-circle m-b" alt="logo">
-                <?php }else{?>
-                    <img src="/admin/uploads/users/<?=$img?>" class="img-circle m-b" alt="logo">
-                <?php } ?>
+            <a href="{{ url('/') }}">
+                @if (!$user->img)
+                    <img src="{{ url('/') }}/admin/images/no_avatar.png" class="img-circle m-b" alt="logo">
+                @else
+                    <img src="{{ url('/') }}/admin/uploads/users/{{ $user->img }}" class="img-circle m-b" alt="logo">
+                @endif
             </a>
             <div class="stats-label text-color">
-{{--                <span class="font-extra-bold font-uppercase">Robert Razer</span>--}}
-
+                <span class="font-extra-bold font-uppercase">{{ $user->name }}</span>
                 <div class="dropdown">
                     <a class="dropdown-toggle" href="#" data-toggle="dropdown">
-                        <small class="text-muted">Founder of App <b class="caret"></b></small>
+                        <small class="text-muted">My Account <b class="caret"></b></small>
                     </a>
                     <ul class="dropdown-menu animated fadeInRight m-t-xs">
-{{--                        <li><a href="contacts.html">Contacts</a></li>
-                        <li><a href="profile.html">Profile</a></li>--}}
-                        <li><a href="#">Analytics</a></li>
+                        <li><a href="{{ url('/') }}/dashboard/profile">Profile</a></li>
                         <li class="divider"></li>
-                        <li><a href="login.html">Logout</a></li>
+                        <li><a href="{{ url('/') }}/logout">Logout</a></li>
                     </ul>
                 </div>
-
 
                 <div id="sparkline1" class="small-chart m-t-sm"></div>
                 <div>
@@ -243,22 +231,22 @@
 
         <ul class="nav" id="side-menu">
             <li class="active">
-                <a href="/dashboard"> <span class="nav-label">Dashboard</span></a>
+                <a href="{{ url('/') }}/dashboard"> <span class="nav-label">Dashboard</span></a>
             </li>
 
             <li>
-                <a href="/dashboard/userslist"> <span class="nav-label">Users</span></a>
+                <a href="{{ url('/') }}/dashboard/userslist"> <span class="nav-label">Users</span></a>
             </li>
             <li>
-                <a href="/dashboard/facility"> <span class="nav-label">Facility</span></a>
-            </li>
-
-            <li>
-                <a href="/dashboard/overview"> <span class="nav-label">Overview</span></a>
+                <a href="{{ url('/') }}/dashboard/facility"> <span class="nav-label">Facility</span></a>
             </li>
 
             <li>
-                <a href="/dashboard/calendar"> <span class="nav-label">Calendar</span></a>
+                <a href="{{ url('/') }}/dashboard/overview"> <span class="nav-label">Overview</span></a>
+            </li>
+
+            <li>
+                <a href="{{ url('/') }}/dashboard/calendar"> <span class="nav-label">Calendar</span></a>
             </li>
 
 
@@ -266,8 +254,8 @@
 {{--            <li>
                 <a href="#"><span class="nav-label">Users</span><span class="fa arrow"></span> </a>
                 <ul class="nav nav-second-level">
-                    <li><a href="/dashboard/userslist">List</a></li>
-                    <li><a href="/dashboard/user/add">Add</a></li>
+                    <li><a href="{{ url('/') }}/dashboard/userslist">List</a></li>
+                    <li><a href="{{ url('/') }}/dashboard/user/add">Add</a></li>
                 </ul>
             </li>--}}
 
@@ -291,7 +279,6 @@
 </div>
 
 <!-- Vendor scripts -->
-
 
 <script src="{{ asset('/admin/vendor/slimScroll/jquery.slimscroll.min.js') }}"></script>
 <script src="{{ asset('/admin/vendor/bootstrap/dist/js/bootstrap.min.js') }}"></script>

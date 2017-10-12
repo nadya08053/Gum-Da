@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\DB;
 
                 <div id="hbreadcrumb" class="pull-right m-t-lg">
                     <ol class="hbreadcrumb breadcrumb">
-                        <li><a href="/dashboard">Dashboard</a></li>
+                        <li><a href="{{ url('/') }}/dashboard">Dashboard</a></li>
                         <li class="active">
                             <span>Facility List</span>
                         </li>
@@ -43,10 +43,7 @@ use Illuminate\Support\Facades\DB;
             <div class="col-lg-12">
                 <div class="hpanel">
                     <div class="panel-body">
-                        <a href="/dashboard/facility/add" class="btn btn-primary" type="button"><i class="fa fa-group"></i> <br/>Add Facility</a>
-
-                        {{--                        <button class="btn btn-danger2" id="deletedShow" type="button"><i class="fa fa-group"></i> <br>Deleted Users</button>--}}
-
+                        <a href="{{ url('/') }}/dashboard/facility/add" class="btn btn-primary" type="button"><i class="fa fa-group"></i> <br/>Add Facility</a>
                     </div>
                 </div>
             </div>
@@ -59,8 +56,6 @@ use Illuminate\Support\Facades\DB;
 
         <div class="row">
             <div class="col-lg-12">
-
-
                 <div class="hpanel">
                     <div class="panel-heading">
                         <div class="panel-tools">
@@ -80,25 +75,24 @@ use Illuminate\Support\Facades\DB;
                             </tr>
                             </thead>
 
-
                             <tbody>
                             <?php
                             foreach($list as $items):
                             ?>
                             <tr>
                                 <td><?php
-                                    if($items->deleted == 1){
-                                        echo '<a href="/dashboard/facility/edit/'. $items->id . '" style="font-style: italic;">'. $items->name .'</a>';
+                                    if(!$items->deleted_at){
+                                        echo '<a href="'.url('/').'/dashboard/facility/edit/'. $items->id . '" style="font-style: italic;">'. $items->name .'</a>';
                                     }else{
-                                        echo '<a href="/dashboard/facility/edit/'. $items->id . '">'. $items->name .'</a>';
+                                        echo '<a href="'.url('/').'/dashboard/facility/edit/'. $items->id . '">'. $items->name .'</a>';
                                     } ?>
                                 </td>
                                 <td><div style=" width: 20px;height: 20px;background-color: <?=$items->color?>;"></div> </td>
                                 <td>
                                     <?php if(!$items->img){?>
-                                    <img style="width: 20px;height: 20px;" src="/admin/images/no_avatar.png">
+                                    <img style="width: 20px;height: 20px;" src="{{ url('/') }}/admin/images/no_avatar.png">
                                     <?php }else{ ?>
-                                        <img style="width: 20px;height: 20px;" src="/admin/uploads/users/<?=$items->img?>">
+                                        <img style="width: 20px;height: 20px;" src="{{ url('/') }}/admin/uploads/facility/<?=$items->img?>">
                                     <?php } ?>
                                 </td>
 
@@ -106,9 +100,9 @@ use Illuminate\Support\Facades\DB;
 
                                     <?php $role = Auth::user()->role;
                                     if($role !== 'Customer'){?>
-                                    <?php if($items->deleted == 0){?>
+                                    <?php if(!$items->deleted_at){?>
                                     <button id="<?=$items->id?>" class="btn btn-danger btn-xs">Delete</button>
-                                    <a href="/dashboard/facility/view/<?=$items->id?>" class="btn btn-info btn-xs">View</a>
+                                    <a href="{{ url('/') }}/dashboard/facility/view/<?=$items->id?>" class="btn btn-info btn-xs">View</a>
                                     <?php }else{ ?>
                                     <button id="<?=$items->id?>" class="btn btn-success btn-xs">Activate</button>
                                     <?php } ?>
@@ -118,11 +112,9 @@ use Illuminate\Support\Facades\DB;
                             <?php endforeach;?>
                             </tbody>
                         </table>
-
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -134,14 +126,6 @@ use Illuminate\Support\Facades\DB;
 
     <script>
         $(function () {
-
-
-            $('#deleted').hide();
-
-            $("#deletedShow").click(function() {
-                $( "#deleted" ).toggle("fast");
-            });
-
 
             $("#example2 tbody").on( "click", "button", function(e) {
                 e.preventDefault();
@@ -167,7 +151,7 @@ use Illuminate\Support\Facades\DB;
                     };
 
                     $.ajax({
-                        url: '/dashboard/facility/delete',
+                        url: "{{ url('/') }}/dashboard/facility/delete",
                         type: 'POST',
                         data: data,
                         success: function (res) {

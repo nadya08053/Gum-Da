@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\DB;
 
                 <div id="hbreadcrumb" class="pull-right m-t-lg">
                     <ol class="hbreadcrumb breadcrumb">
-                        <li><a href="/dashboard">Dashboard</a></li>
+                        <li><a href="{{ url('/') }}/dashboard">Dashboard</a></li>
                         <li class="active">
                             <span>Users List</span>
                         </li>
@@ -43,16 +43,12 @@ use Illuminate\Support\Facades\DB;
             <div class="col-lg-12">
                 <div class="hpanel">
                     <div class="panel-body">
-                        <a href="/dashboard/user/add" class="btn btn-primary" type="button"><i class="fa fa-group"></i> <br/>Add User</a>
-
-{{--                        <button class="btn btn-danger2" id="deletedShow" type="button"><i class="fa fa-group"></i> <br>Deleted Users</button>--}}
-
-                        </div>
+                        <a href="{{ url('/') }}/dashboard/user/create" class="btn btn-primary" type="button"><i class="fa fa-group"></i> <br/>Add User</a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
     <?php } ?>
 
     <div class="content" style="padding-top: 0;">
@@ -90,15 +86,15 @@ use Illuminate\Support\Facades\DB;
                             ?>
                             <tr>
                                 <td><?php
-                                    if($items->deleted == 1){
-                                    echo '<a href="/dashboard/user/edit/'. $items->id . '" style="font-style: italic;">'. $items->name .'</a>';
+                                    if(!$items->deleted_at){
+                                    echo '<a href="'.url('/').'/dashboard/user/edit/'. $items->id . '" style="font-style: italic;">'. $items->name .'</a>';
                                     }else{
-                                        echo '<a href="/dashboard/user/edit/'. $items->id . '">'. $items->name .'</a>';
+                                        echo '<a href="'.url('/').'/dashboard/user/edit/'. $items->id . '">'. $items->name .'</a>';
                                      } ?>
                                 </td>
                                 <td><?php echo '<a href="mailto:'.$items->email.'">' . $items->email . '</a>'?></td>
                                 <td><?php
-                                    $trainer = $items->trainers_id;
+                                    $trainer = $items->trainer_id;
                                         $name = DB::table('users')->select('name')->where('id', $trainer)->get();
 
                                         foreach($name as $item){
@@ -112,10 +108,10 @@ use Illuminate\Support\Facades\DB;
 
                                     <?php $role = Auth::user()->role;
                                     if($role !== 'Customer'){?>
-                                       <?php if($items->deleted == 0){?>
-                                       <button id="<?=$items->id?>" class="btn btn-danger btn-xs">Delete</button>
+                                       <?php if(!$items->deleted_at){?>
+                                            <button id="<?=$items->id?>" class="btn btn-danger btn-xs">Delete</button>
                                         <?php }else{ ?>
-                                        <button id="<?=$items->id?>" class="btn btn-success btn-xs">Activate</button>
+                                            <button id="<?=$items->id?>" class="btn btn-success btn-xs">Activate</button>
                                         <?php } ?>
                                     <?php } ?>
                                 </td>
@@ -127,12 +123,8 @@ use Illuminate\Support\Facades\DB;
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
-
-
-
 
     <script src="{{ asset('/admin/vendor/datatables/media/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('/admin/vendor/datatables_plugins/integration/bootstrap/3/dataTables.bootstrap.min.js') }}"></script>
@@ -140,18 +132,8 @@ use Illuminate\Support\Facades\DB;
     <script>
         $(function () {
 
-
-            $('#deleted').hide();
-
-            $("#deletedShow").click(function() {
-                $( "#deleted" ).toggle("fast");
-            });
-
-
             $("#example2 tbody").on( "click", "button", function(e) {
                 e.preventDefault();
-
-
                 var texts = $(this).text();
                 var val = '';
                 if(texts == 'Delete') {
@@ -170,13 +152,11 @@ use Illuminate\Support\Facades\DB;
                         val:val,
                         deleted :true
                     };
-
                     $.ajax({
-                        url: '/dashboard/user/delete',
+                        url: "{{ url('/') }}/dashboard/user/delete",
                         type: 'POST',
                         data: data,
                         success: function (res) {
-                            //console.log(res);
                             if (res == 1) {
                                 location.reload();
                             }

@@ -7,133 +7,94 @@ use App\Http\Controllers\Controller;
 
 use App\Helper\Help;
 use Illuminate\Support\Facades\DB;
+use App\Facility;
 
 class DashboardFacilityController extends Controller
 {
     public function index(){
 
-            $list = DB::table('facility')->get();
+        $list = DB::table('facilities')->get();
 
         return view('admin.facility.index',[
             'list' => $list,
         ]);
     }
 
+    public function add(){
+        $data = [
+            'title' => 'Add',
+            'action' => url('dashboard/facility/store')
+        ];
+        return view('admin.facility.add-edit', $data);
+    }
+
+    public function store(Request $request)
+    {
+        $finfo = $request->all();
+
+        if($_FILES['file']['error'] == false) {
+            $img['file'] = $_FILES['file'];
+            $path = 'admin/uploads/facility/';
+            $finfo['img'] = Help::resizeAndUpload($img, $path);
+        }
+
+        Facility::create($finfo);
+        return redirect('dashboard/facility');
+    }
 
     public function edit($id){
 
-        if(!empty($id)) {
-            $facility = DB::table('facility')->where('id', $id)->get();
-        }
+        $facility = Facility::findOrFail($id);
 
-        return view('admin.facility.edit',[
+        $data = [
+            'title' => 'Edit',
+            'action' => url('dashboard/facility/update'),
             'facility' => $facility
-        ]);
+        ];
+
+        return view('admin.facility.add-edit', $data);
     }
 
 
-    public function update(){
+    public function update(Request $request){
 
+        $facility = Facility::findOrFail($request->id);
+        $finfo = $request->all();
 
-        if(!empty($_POST)) {
-
-            if($_FILES['file']['error'] == false) {
-                $img['file'] = $_FILES['file'];
-                $path = 'admin/uploads/users/';
-                $_POST['img'] = Help::resizeAndUpload($img, $path);
-            }
-
-            $id = $_POST['id'];
-            unset($_POST['id']);
-
-
-            foreach ($_POST as $key => $value) {
-                DB::table('facility')
-                    ->where('id', $id)
-                    ->update([$key => trim(addslashes(strip_tags($value)))]);
-            }
-
-            echo 1;
-            exit;
+        if($_FILES['file']['error'] == false) {
+            $img['file'] = $_FILES['file'];
+            $path = 'admin/uploads/facility/';
+            $finfo['img'] = Help::resizeAndUpload($img, $path);
         }
 
+        $facility->fill($finfo);
+        $facility->save();
+        return redirect('dashboard/facility');
     }
 
 
     public function delete(){
-
-
-
         if(!empty($_POST['deleted'])) {
             $id = $_POST['id'];
             $val = $_POST['val'];
-
-            DB::table('facility')
-                ->where('id', $id)
-                ->update(['deleted' => $val]);
-
-            echo 1;exit;
-        }
-
-        if(!empty($_POST['deleted_fac'])) {
-            $id = $_POST['id'];
-            $facility_id = $_POST['facility_id'];
-
-            DB::table('users_facility')->where([
-                ['facility_id', '=', $facility_id],
-                ['users_id', '=', $id]
-            ])->delete();
-
-            echo 1;exit;
-        }
-
-        if(!empty($_POST['deletedImg'])){
-            $id = $_POST['id'];
-
-            DB::table('facility')
-                ->where('id', $id)
-                ->update(['img' => null]);
-
-            echo 1;exit;
-        }
-    }
-
-    public function add(){
-
-        if(!empty($_POST)){
-            unset($_POST['add']);
-            if($_FILES['file']['error'] == false) {
-                $img['file'] = $_FILES['file'];
-                $path = 'admin/uploads/users/';
-                $_POST['img'] = Help::resizeAndUpload($img, $path);
-            }else{
-                $_POST['img'] = null;
+            if ($val == 1) {
+                $deleted = date('Y-m-d H:i:s');
+            } else {
+                $deleted = Null;
             }
 
-            DB::table('facility')->insert(
-                [
-                    'name'=>trim(addslashes(strip_tags($_POST['name']))),
-                    'color'=>$_POST['color'],
-                    'img'=>$_POST['img'],
-                    'deleted'=> 0,
-                    'created_at'=>date('Y-m-d H:i:s'),
-                ]
-            );
+            DB::table('facilities')
+                ->where('id', $id)
+                ->update(['deleted_at' => $deleted]);
 
-
-
-            echo 1;
-            exit;
-
+            echo 1;exit;
         }
-
-        return view('admin.facility.add');
     }
 
     public function view($id){
 
         if(!empty($id)) {
-            $users_id = DB::table('users_facility')->select('users_id')->where('facility_id', $id)->get();
+            $users_id = DB::table('users')->select('id')->where('facility_id', $id)->get();
         }
         $facility_id = $id;
 
@@ -142,6 +103,4 @@ class DashboardFacilityController extends Controller
             'facility_id'=>$facility_id
         ]);
     }
-
-
 }
